@@ -11,7 +11,6 @@ from story import (
     prologue,
     tire_event,
     tire_checked,
-    tire_ignored,
     road_event,
     paved_result,
     unpaved_aired_result,
@@ -21,7 +20,6 @@ from story import (
     help_result,
     person_event,
     person_helped_result,
-    person_ignored_result,
     endings
 )
 
@@ -59,8 +57,6 @@ time_left, tire_aired = check_tires(choice, time_left)
 
 if choice == "A":
     print("\n" + tire_checked)
-else:
-    print("\n" + tire_ignored)
 
 input("\nاضغط Enter للمتابعة...")
 
@@ -123,8 +119,6 @@ time_left = help_person(choice, time_left)
 
 if choice == "A":
     print("\n" + person_helped_result)
-else:
-    print("\n" + person_ignored_result)
 
 input("\nاضغط Enter للمتابعة...")
 
