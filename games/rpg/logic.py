@@ -1,71 +1,46 @@
+"""
+logic.py - منطق اللعبة (الوقت والقرارات والنهايات) بدون أي نصوص أو واجهة.
+"""
+
+START_TIME = 60  # دقائق الوقت المتاح للتجهيز
+
+
 def check_tires(choice, time_left):
-    """
-    Handle the tire-check decision.
-    A: Check the car and air down the tires.
-    B: Ignore the feeling and leave immediately.
-    """
+    """A: تشيّك وتنسّم الكفرات (-5 دقائق) | B: تتجاهل الإحساس."""
     if choice == "A":
-        time_left -= 5
-        tire_aired = True
-    else:
-        tire_aired = False
-    return time_left, tire_aired
+        return time_left - 5, True
+    return time_left, False
 
 
 def choose_road(choice, time_left):
-    """
-    Handle the road choice.
-    A: Take the paved road.
-    B: Take the unpaved road.
-    """
+    """A: الطريق الممهّد (-30) | B: الطريق غير الممهّد (-20)."""
     if choice == "A":
-        time_left -= 30
-        road = "paved"
-    else:
-        time_left -= 20
-        road = "unpaved"
-    return time_left, road
+        return time_left - 30, "paved"
+    return time_left - 20, "unpaved"
 
 
 def handle_stuck(tire_aired, choice, time_left):
     """
-    Handle what happens if the player takes the unpaved road
-    without airing down the tires.
-    If the tires were aired down:
-        The car gets out quickly،
-    If the tires were not aired down:
-        A: Try to get the car out yourself.
-           but fails, so you still wait for help.
-        B: Wait for someone to pass and help.
+    التغريز في الطريق غير الممهّد.
+    الكفرات منسّمة: تطلع السيارة بسرعة بدون خسارة وقت.
+    غير منسّمة:
+        A: تحاول أكثر (-25) ثم تنتظر مساعدة
+        B: تنتظر شخص يساعدك (-15)
     """
     if tire_aired:
         return time_left, False
-    if choice == "A":
-        time_left -= 10
-        time_left -= 15
-    else:
-        time_left -= 15
-    return time_left, True
+    return (time_left - 25 if choice == "A" else time_left - 15), True
 
 
 def help_person(choice, time_left):
-    """
-    Handle the final person's choice.
-    A: Give the person a ride.
-    B: Continue without helping.
-    """
-    if choice == "A":
-        time_left += 5
-    return time_left
+    """A: توصّل الشخص (+5 بركة في الوقت) | B: تكمل."""
+    return time_left + 5 if choice == "A" else time_left
 
 
 def get_ending(time_left):
-    """
-    Determine the ending based on remaining time.
-    """
-    if time_left >= 20:
+    """تحديد النهاية حسب الوقت المتبقي."""
+    if time_left >= 35:
         return "best"
-    elif time_left > 0:
+    if time_left > 15:
         return "good"
-    else:
-        return "late"
+    return "late"
