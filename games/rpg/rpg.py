@@ -207,7 +207,19 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
+def apply_background():
+    """خلفية اللعبة: صورة مع طبقة تعتيم عشان النص يبقى مقروء."""
+    p = IMAGES_DIR / "rpg_background.jpg"
+    if not p.exists():
+        return  # لو الصورة غير موجودة تبقى الخلفية القديمة
+    data = _b64(str(p), p.stat().st_mtime)
+    st.markdown(f"""<style>
+    .stApp{{ background:
+        linear-gradient(rgba(1,8,6,.72), rgba(1,8,6,.88)),
+        url("data:image/jpeg;base64,{data}") center/cover fixed no-repeat !important; }}
+    </style>""", unsafe_allow_html=True)
 
+apply_background()
 # ───────────────────────── STATE ─────────────────────────
 S = st.session_state
 
