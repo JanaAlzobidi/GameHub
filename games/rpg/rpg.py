@@ -1,45 +1,51 @@
 """
-رحلة الشهب 🌠  |  Meteor Night - a short Saudi-themed story game
-Run:  streamlit run game.py
+رحلة الشهب 🌠  |  Meteor Night - لعبة قصصية قصيرة بطابع سعودي
+
+فكرة اللعبة:
+  تستيقظ متأخرًا قبل موعد تصوير زخة الشهب، ولازم تلحق الموقع قبل الساعة ٩:٠٠.
+  كل قرار تأخذه (الكفرات، الطريق، مساعدة شخص) يأثر على الوقت المتبقي،
+  والوقت المتبقي يحدد النهاية (مثالية / جيدة / متأخرة).
 
 الملفات:
-  game.py   -> الواجهة والتصميم وتشغيل اللعبة (هذا الملف)
+  rpg.py    -> الواجهة والتصميم وتشغيل اللعبة (هذا الملف)
   story.py  -> نصوص القصة
   logic.py  -> منطق اللعبة (الوقت والقرارات والنهايات)
 
-Images: put them in an "images" folder next to this file.
-The scene -> file name mapping is in SCENE_IMAGES (search for it below).
+الصور: توضع في مجلد اسمه "images" بجانب هذا الملف.
+ربط كل مشهد باسم ملف الصورة موجود في القاموس SCENE_IMAGES أدناه.
 """
 import base64
 from pathlib import Path
 
 import streamlit as st
 
+# من logic.py: الوقت الابتدائي + دوال القرارات + دالة تحديد النهاية
 from logic import (START_TIME, check_tires, choose_road, handle_stuck,
                    help_person, get_ending)
+# من story.py: كل النصوص (المقدمة، الأحداث، النتائج، النهايات، عناوين الفصول)
 from story import (GAME_TITLE, TAGLINE, PROLOGUE, TIRE_EVENT, TIRE_CHECKED,
                    ROAD_EVENT, PAVED_RESULT, UNPAVED_AIRED, UNPAVED_NOT_AIRED,
                    STUCK_EVENT, STUCK_TRY, HELP_RESULT, PERSON_EVENT,
                    PERSON_HELPED, ENDINGS, CHAPTERS, SCENE_HINTS)
 
+# إعداد الصفحة: العنوان وأيقونة التبويب. لازم يكون أول أمر من أوامر streamlit.
 st.set_page_config(page_title=GAME_TITLE, page_icon="🌠", layout="centered")
 
-# ───────────────────────── IMAGES (folder "images" next to this file) ─────────────────────────
+# ───────────────────────── الصور (مجلد "images" بجانب هذا الملف) ─────────────────────────
 IMAGES_DIR = Path(__file__).resolve().parents[2] / "assets"
 
-# اسم المشهد  ->  اسم ملف الصورة داخل مجلد images
-# أي مشهد ما له صورة هنا (أو الملف مو موجود) يستخدم الرسمة المدمجة بدلًا منها.
+# قاموس يربط اسم المشهد (يسار) باسم ملف الصورة داخل مجلد images (يمين).
+# إذا الملف غير موجود أو اسمه مختلف، تظهر لوحة بديلة بدل الصورة تكتب لك الاسم المطلوب.
 SCENE_IMAGES = {
-     "title":      "الواجهة2.jpg",
-    # المقدمة: p1 و p2 و p3 لسا ما لها صور → تظهر مكانها لوحة Placeholder
-    # (صمم الصورة وسمّها بنفس الاسم هنا وحطها في مجلد images)
+     "title":      "الواجهة2.jpg",          # الشاشة الرئيسية
+    # صور المقدمة (p1 إلى p6)
     "p1":         "زحمه الطرق.jpg",
     "p2":         "تخطيط2.jpg",
     "p3":         "تقويم.jpg",
     "p4":         "غفوه2.jpg",
     "p5":         "الاستيقاظ متأخرا.jpg",
     "p6":         "الانطلاق2.jpg",
-    # الأحداث
+    # صور الأحداث
     "tire":       "طريق حاره.jpg",
     "tire_ok":    "قيادة السيارة في طريق البر والتعامل مع الكفرات والطرق.jpg",
     "road":       "طريق مختصر.jpg",
@@ -49,9 +55,9 @@ SCENE_IMAGES = {
     "help":       "مساعده بعد التغريز.jpg",
     "person":     "استغاثه بدون شهب.jpg",
     "person_ok":  "استغاثه بدون شهب.jpg",
-    # النهايات
+    # صور النهايات
     "best":       "نهايه مثاليه.jpg",
-    "best_win":   "فوز الصوره.jpg",
+    "best_win":   "فوز الصوره.jpg",          # تظهر مع النهاية المثالية فقط
     "good":       "التأمل وتصوير النجوم (عند التأخر أو ضيق الوقت).jpg",
     "late":       "التأمل وتصوير النجوم (عند التأخر أو ضيق الوقت).jpg",
 }
@@ -63,27 +69,37 @@ def _b64(path_str, mtime):
 
 
 def show_scene(key):
+    """يعرض صورة المشهد (key). إذا الصورة غير موجودة يعرض لوحة بديلة."""
     name = SCENE_IMAGES.get(key)
     path = IMAGES_DIR / name if name else None
     if path and path.exists():
+        # الصورة موجودة: نحدد نوعها (jpg أو png) ونعرضها داخل إطار ذهبي
         ext = path.suffix.lower().lstrip(".")
         mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         data = _b64(str(path), path.stat().st_mtime)
         st.markdown(f'<div class="frame"><img src="data:{mime};base64,{data}"></div>', unsafe_allow_html=True)
     else:
+        # الصورة غير موجودة: لوحة بديلة فيها اسم المشهد واسم الملف المطلوب
         fname = name or f"{key}.jpg"
         hint = SCENE_HINTS.get(key, "")
         st.markdown(f'<div class="ph"><div class="ph-ic">🖼️</div><div class="ph-t">مكان الصورة · {key}</div>'
                     f'<div class="ph-h">{hint}</div><code>images/{fname}</code></div>', unsafe_allow_html=True)
 
 
-# ───────────────────────── STYLE (RPG × Saudi theme) ─────────────────────────
+# ───────────────────────── التصميم (طابع RPG × سعودي) ─────────────────────────
+# كل التصميم مكتوب بـ CSS داخل هذا النص، ويُحقن في الصفحة بـ st.markdown.
 CSS = """
 <style>
+/* الخطوط: Tajawal للنصوص، وAref Ruqaa للعناوين والأرقام */
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Aref+Ruqaa:wght@700&display=swap');
+
+/* متغيرات الألوان: ذهبي (gold) وأخضر داكن (g0 إلى g3)، وارتفاع الصورة الأقصى (imgmax) */
 :root{ --gold:#D4AF37; --gold2:#F3DC8A; --gold-dim:rgba(212,175,55,.35);
        --g0:#010806; --g1:#03150e; --g2:#072a1c; --g3:#0d4a31; --panel:rgba(2,12,8,.93); --ink:#E4DDC3; --mist:rgba(127,214,192,.16); --imgmax:58vh; }
 html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !important; }
+
+/* خلفية الصفحة الافتراضية: نقش زخرفي + تدرج أخضر، واتجاه الكتابة من اليمين لليسار.
+   (تُستبدل بصورة الخلفية في دالة apply_background أدناه إذا الصورة موجودة) */
 .stApp{
   direction:rtl; color:var(--ink);
   background:
@@ -91,22 +107,13 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
     radial-gradient(ellipse at 50% -15%, var(--g3) 0%, var(--g2) 22%, var(--g1) 50%, var(--g0) 100%);
   background-attachment: fixed;
 }
-.stApp::before{ content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background:radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.85) 100%); }
-.stApp::after{ content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background:
-    radial-gradient(1.6px 1.6px at 8% 12%, #fff, transparent), radial-gradient(1.2px 1.2px at 22% 38%, #F3DC8A, transparent),
-    radial-gradient(1.8px 1.8px at 35% 9%, #fff, transparent), radial-gradient(1.2px 1.2px at 48% 27%, #fff, transparent),
-    radial-gradient(1.6px 1.6px at 63% 14%, #F3DC8A, transparent), radial-gradient(1.2px 1.2px at 77% 33%, #fff, transparent),
-    radial-gradient(1.8px 1.8px at 90% 10%, #fff, transparent), radial-gradient(1.2px 1.2px at 14% 72%, #fff, transparent),
-    radial-gradient(1.6px 1.6px at 55% 82%, #F3DC8A, transparent), radial-gradient(1.2px 1.2px at 93% 66%, #fff, transparent),
-    radial-gradient(ellipse 60% 22% at 20% 92%, var(--mist), transparent), radial-gradient(ellipse 55% 20% at 85% 78%, var(--mist), transparent);
-  animation:breathe 7s ease-in-out infinite alternate; }
-@keyframes breathe{ from{opacity:.35;} to{opacity:1;} }
+
+
+/* إخفاء عناصر streamlit الافتراضية (القائمة والفوتر والهيدر) وضبط عرض المحتوى */
 #MainMenu, footer, header{ visibility:hidden; }
 .block-container{ max-width:780px; padding-top:.6rem; padding-bottom:1rem; position:relative; z-index:1; }
 
-/* Logo */
+/* الشعار (عنوان اللعبة): كبير في الشاشة الرئيسية، ومصغّر في أعلى اليمين أثناء اللعب (compact) */
 .logo{ text-align:center; margin:0 0 10px; }
 .logo.compact{ position:fixed; top:8px; right:22px; z-index:20; margin:0; text-align:right; }
 .logo.compact h1{ font-size:1.6rem; margin:0; }
@@ -120,7 +127,7 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
   -webkit-text-fill-color:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,.8)) drop-shadow(0 0 14px rgba(212,175,55,.35)); }
 .logo .sub{ color:var(--gold2); font-size:.95rem; font-weight:500; }
 
-/* Scene image */
+/* صورة المشهد: إطار ذهبي مع ظل وتوهج */
 [data-testid="stImage"] img, .frame{
   border:3px solid var(--gold); border-radius:6px; outline:1px solid var(--gold-dim); outline-offset:6px;
   box-shadow:0 0 0 6px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.65), 0 0 24px rgba(212,175,55,.18); }
@@ -131,6 +138,8 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
 .card p{ margin:0; }
 .frame{ width:100%; box-sizing:border-box; aspect-ratio:16/9; max-height:var(--imgmax); }
 .frame img{ width:100%; height:100%; object-fit:cover; display:block; filter:brightness(.84) contrast(1.07) saturate(.85); }
+
+/* اللوحة البديلة (Placeholder): تظهر إذا صورة المشهد غير موجودة */
 .ph{ width:100%; box-sizing:border-box; aspect-ratio:16/9; max-height:var(--imgmax); margin:4px 0 12px; border:2px dashed var(--gold); border-radius:6px; background:rgba(2,12,8,.65);
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-align:center;
   box-shadow:inset 0 0 40px rgba(0,0,0,.6); }
@@ -140,6 +149,7 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
   border-radius:4px; padding:1px 10px; font-size:.8rem; margin-top:4px; }
 [data-testid="stImage"] img{ width:100% !important; box-sizing:border-box; height:min(56.25cqw, var(--imgmax)) !important; aspect-ratio:auto; max-height:none; object-fit:cover; }
 
+/* حركات: ظهور الصورة تدريجيًا، وتوهج الإطار الذهبي، وتوهج العنوان */
 [data-testid="stImage"] img{ filter:brightness(.84) contrast(1.07) saturate(.85);
   animation:emerge 1.5s ease both, lantern 5s ease-in-out infinite alternate; }
 .frame{ animation:fadein 1.2s ease both, lantern 5s ease-in-out infinite alternate; }
@@ -153,7 +163,7 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
   from{ filter:drop-shadow(0 2px 6px rgba(0,0,0,.9)) drop-shadow(0 0 6px rgba(212,175,55,.15)); }
   to{ filter:drop-shadow(0 2px 6px rgba(0,0,0,.9)) drop-shadow(0 0 22px rgba(212,175,55,.55)); } }
 
-/* HUD: a gold timeline from 8:00 (right) to 9:00 (left) */
+/* شريط الحالة (HUD): اسم الفصل + الوقت المتبقي + خط زمني ذهبي من ٨:٠٠ (يمين) إلى ٩:٠٠ (يسار) */
 .hud{ --c:#F3DC8A; --glow:rgba(212,175,55,.85); position:relative; padding:2px 4px 10px; margin-bottom:10px; }
 .hud::after{ content:""; position:absolute; bottom:0; left:0; right:0; height:1px;
   background:linear-gradient(90deg, transparent, var(--gold-dim), transparent); }
@@ -174,25 +184,29 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
   animation:ember 2.4s ease-in-out infinite alternate; }
 @keyframes ember{ from{ opacity:.65; box-shadow:0 0 6px 1px var(--glow), 0 0 14px 3px var(--glow); }
                   to{ opacity:1; box-shadow:0 0 9px 3px var(--glow), 0 0 26px 8px var(--glow); } }
+
+/* الشارات الصغيرة تحت الخط الزمني (حالة الكفرات ونوع الطريق) */
 .chips{ display:flex; flex-wrap:wrap; align-items:center; }
 .chip{ color:var(--ink); opacity:.65; font-size:.8rem; }
 .chip + .chip::before{ content:"·"; margin:0 9px; color:var(--gold); }
 
-/* Dialogue box */
+/* صندوق الحوار (نص الراوي) مع زخارف ❖ في الأسفل */
 .card{ position:relative; background:var(--panel); border:2px solid var(--gold); border-radius:8px; padding:20px 24px 14px;
   margin:22px 0 12px; font-size:1.05rem; line-height:1.85; color:var(--ink); direction:rtl; text-align:right;
   box-shadow:inset 0 0 0 4px rgba(0,0,0,.55), inset 0 0 0 5px var(--gold-dim), 0 8px 24px rgba(0,0,0,.6);
   animation:rise .55s ease both; }
 .card::before,.card::after{ content:"❖"; position:absolute; color:var(--gold); font-size:.95rem; background:var(--g0); padding:0 4px; }
 .card::before{ bottom:-12px; left:18px; } .card::after{ bottom:-12px; right:18px; }
+/* لوحة اسم المتحدث (الراوي / النهاية) فوق الصندوق */
 .nameplate{ position:absolute; top:-17px; right:22px; background:linear-gradient(180deg,var(--gold2),var(--gold) 60%,#9a7a1c);
   color:#1b1405; font-weight:800; font-size:.9rem; padding:3px 22px; border-radius:4px; border:1px solid #6e5410;
   box-shadow:0 3px 8px rgba(0,0,0,.6); }
 .card h3{ color:var(--gold); font-family:'Aref Ruqaa','Tajawal',serif !important; font-size:1.9rem; margin:4px 0 8px; text-align:center; }
+/* صندوق النهاية: توهج أقوى من الصندوق العادي */
 .card.end{ border-color:var(--gold2); box-shadow:inset 0 0 0 4px rgba(0,0,0,.55), inset 0 0 0 5px var(--gold), 0 0 34px rgba(212,175,55,.35), 0 8px 24px rgba(0,0,0,.6); }
 @keyframes rise{ from{opacity:0; transform:translateY(14px); filter:blur(7px);} to{opacity:1; transform:none; filter:none;} }
 
-/* Choice / action buttons */
+/* أزرار الاختيارات والتنقل (التالي / ابدأ / العب مرة ثانية) */
 .stButton > button{ width:100%; direction:rtl; text-align:center; color:var(--ink); font-size:1rem; font-weight:700;
   padding:.55rem 1.1rem; border-radius:6px; border:2px solid var(--gold-dim);
   background:linear-gradient(180deg,rgba(10,52,35,.9),rgba(2,14,9,.97)); box-shadow:0 3px 12px rgba(0,0,0,.7);
@@ -206,12 +220,15 @@ html, body, .stApp, [class*="css"], button { font-family:'Tajawal',sans-serif !i
 [data-testid="stColumn"] .stButton > button, [data-testid="column"] .stButton > button{ min-height:4.2rem; }
 </style>
 """
+# حقن التصميم في الصفحة
 st.markdown(CSS, unsafe_allow_html=True)
+
+
 def apply_background():
-    """خلفية اللعبة: صورة مع طبقة تعتيم عشان النص يبقى مقروء."""
-    p = IMAGES_DIR / "rpg_background.jpg"
+    """خلفية اللعبة: صورة background.png مع طبقة تعتيم عشان النص يبقى مقروء."""
+    p = IMAGES_DIR / "background.png"
     if not p.exists():
-        return  # لو الصورة غير موجودة تبقى الخلفية القديمة
+        return  # لو الصورة غير موجودة تبقى الخلفية الافتراضية (التدرج الأخضر)
     data = _b64(str(p), p.stat().st_mtime)
     st.markdown(f"""<style>
     .stApp{{ background:
@@ -220,71 +237,102 @@ def apply_background():
     </style>""", unsafe_allow_html=True)
 
 apply_background()
-# ───────────────────────── STATE ─────────────────────────
+
+
+# ───────────────────────── حالة اللعبة (Session State) ─────────────────────────
+# S هو "ذاكرة" اللعبة، يحفظ بيانات اللاعب بين كل ضغطة زر وأخرى:
+#   stage   : الشاشة الحالية (title / prologue / tire / road / stuck / person / result / ending)
+#   i       : رقم فقرة المقدمة الحالية
+#   time    : الوقت المتبقي بالدقائق
+#   aired   : هل نسّم الكفرات؟ (True / False)
+#   road    : نوع الطريق المختار ("paved" ممهّد / "unpaved" غير ممهّد)
+#   r_img, r_texts, r_next : بيانات شاشة النتيجة (صورتها، نصوصها، والمرحلة التالية)
 S = st.session_state
 
 def reset():
+    """يعيد اللعبة للبداية بالقيم الابتدائية."""
     S.update(stage="title", i=0, time=START_TIME, aired=False, road=None, r_img="", r_texts=[], r_next="")
 
+# أول مرة تفتح الصفحة: نجهز الحالة
 if "stage" not in S:
     reset()
 
 def go(stage):
+    """ينتقل إلى شاشة معينة."""
     S.stage = stage
 
 def show(img, texts, nxt):
+    """يعرض شاشة نتيجة: صورة + نصوص، وزر "التالي" ينقلك إلى المرحلة nxt."""
     S.update(stage="result", r_img=img, r_texts=texts, r_next=nxt)
 
 def start():
+    """يبدأ اللعبة من المقدمة (يصفّر كل شيء أولًا)."""
     reset(); S.stage = "prologue"
 
 def next_prologue():
+    """يتقدم فقرة في المقدمة، وبعد آخر فقرة ينتقل لأول حدث (الكفرات)."""
     S.i += 1
     if S.i >= len(PROLOGUE):
         go("tire")
 
+# ───────────── معالجة اختيارات اللاعب (تربط منطق اللعبة بالقصة) ─────────────
+# كل دالة تستقبل حرف الاختيار c ("A" أو "B")، تحدّث الوقت، ثم تقرر الشاشة التالية.
+
 def pick_tire(c):
+    """قرار الكفرات: A = تشيّك وتنسّم، B = تتجاهل الإحساس."""
     S.time, S.aired = check_tires(c, S.time)
     if c == "A":
-        show("tire_ok", [TIRE_CHECKED], "road")
+        show("tire_ok", [TIRE_CHECKED], "road")   # يعرض نتيجة التنسيم ثم يروح للطريق
     else:
         go("road")
 
 def pick_road(c):
+    """قرار الطريق: الممهّد يكمل مباشرة، وغير الممهّد يعتمد على تنسيم الكفرات."""
     S.time, S.road = choose_road(c, S.time)
     if S.road == "paved":
         show("paved", [PAVED_RESULT], "person")
     elif S.aired:
+        # كفراتك منسّمة: تغريز بسيط وتطلع السيارة بدون خسارة وقت
         S.time, _ = handle_stuck(True, None, S.time)
         show("aired", [UNPAVED_AIRED], "person")
     else:
+        # كفراتك غير منسّمة: تغريز حقيقي، ننتقل لشاشة اختيار ما تسوي
         go("stuck")
 
 def pick_stuck(c):
+    """قرار التغريز: A = تحاول أكثر (تخسر وقت أكثر)، B = تنتظر مساعدة."""
     S.time, _ = handle_stuck(False, c, S.time)
+    # لو اخترت "تحاول أكثر" يظهر نص المحاولة الفاشلة قبل نص المساعدة
     show("help", ([STUCK_TRY] if c == "A" else []) + [HELP_RESULT], "person")
 
 def pick_person(c):
+    """قرار الشخص الواقف في الطريق: A = توصّله (+5 دقائق بركة)، B = تكمل طريقك."""
     S.time = help_person(c, S.time)
     if c == "A":
         show("person_ok", [PERSON_HELPED], "ending")
     else:
         go("ending")
 
-# ───────────────────────── UI HELPERS ─────────────────────────
+# ───────────────────────── دوال مساعدة للواجهة ─────────────────────────
 def banner(compact=False):
+    """يعرض عنوان اللعبة، مصغّرًا إذا compact=True (أثناء اللعب)."""
     st.markdown(f'<div class="logo{" compact" if compact else ""}"><h1>{GAME_TITLE}</h1>'
                 f'<div class="sub">{TAGLINE}</div></div>', unsafe_allow_html=True)
 
 def hud():
-    t = max(S.time, 0)
-    pct = min(max((START_TIME - S.time) / START_TIME * 100, 0), 100)  # how far along 8:00 → 9:00
+    """شريط الحالة: اسم الفصل، الوقت المتبقي، الخط الزمني، وشارات الكفرات والطريق."""
+    t = max(S.time, 0)  # ما نعرض وقتًا سالبًا
+    pct = min(max((START_TIME - S.time) / START_TIME * 100, 0), 100)  # نسبة التقدم على الخط الزمني ٨:٠٠ → ٩:٠٠
+    # مفتاح المشهد الحالي: نستخدمه لمعرفة عنوان الفصل
     key = S.r_img if S.stage == "result" else S.stage
     chips = ""
+    # شارة الكفرات: ما تظهر في أول حدث لأن اللاعب ما قرر بعد
     if key != "tire":
         chips += f'<span class="chip">🛞 الكفرات: {"منسّمة" if S.aired else "عادية"}</span>'
+    # شارة الطريق: تظهر بعد ما يختار الطريق
     if S.road:
         chips += f'<span class="chip">🛣️ الطريق: {"ممهّد" if S.road == "paved" else "رملي"}</span>'
+    # علامات الخط الزمني (كل ٢٠٪)
     ticks = "".join(f'<i class="tick" style="right:{x}%"></i>' for x in (20, 40, 60, 80))
     st.markdown(f'<div class="hud"><div class="hud-top"><span class="chapter">{CHAPTERS.get(key, "")}</span>'
                 f'<span class="timelbl">الوقت المتبقي <span class="tnum">{t}</span> دقيقة</span></div>'
@@ -294,54 +342,66 @@ def hud():
                 f'<div class="chips">{chips}</div></div>', unsafe_allow_html=True)
 
 def card(text, title=None, cls="", name="الراوي"):
-    body = text.replace("\n", "<br>")
+    """صندوق حوار فيه نص الراوي. العنوان (title) اختياري ويُستخدم في النهايات."""
+    body = text.replace("\n", "<br>")  # تحويل الأسطر الجديدة إلى HTML
     head = f"<h3>{title}</h3>" if title else ""
     st.markdown(f'<div class="card {cls}"><div class="nameplate">{name}</div>{head}{body}</div>', unsafe_allow_html=True)
 
 def choices(options, callback):
+    """يعرض أزرار الاختيارات جنب بعض. عند الضغط ينفذ callback مع حرف الاختيار (A أو B)."""
     cols = st.columns(len(options))
     for col, (k, label) in zip(cols, options.items()):
         letter = "أ" if k == "A" else "ب"
         with col:
             st.button(f"◆  {letter} · {label}", key=f"{S.stage}_{k}", on_click=callback, args=(k,))
 
-# ───────────────────────── SCREENS ─────────────────────────
+# ───────────────────────── الشاشات ─────────────────────────
+# العنوان يظهر مصغّرًا في كل الشاشات ما عدا الشاشة الرئيسية
 banner(S.stage != "title")
 stage = S.stage
 
+# الشاشة الرئيسية: صورة الغلاف وزر البدء
 if stage == "title":
     show_scene("title")
     st.button("🚗 ابدأ الطلعة", on_click=start)
 
+# المقدمة: فقرة وصورة في كل مرة، وزر "التالي" للتقدم
 elif stage == "prologue":
     key, text = PROLOGUE[S.i]
     show_scene(key)
     card(text)
     st.button("التالي ◀", on_click=next_prologue)
 
+# حدث ١: الكفرات (تشيّك أو تتجاهل)
 elif stage == "tire":
     hud(); show_scene("tire"); card(TIRE_EVENT[0]); choices(TIRE_EVENT[1], pick_tire)
 
+# حدث ٢: مفترق الطرق (ممهّد أو غير ممهّد)
 elif stage == "road":
     hud(); show_scene("road"); card(ROAD_EVENT[0]); choices(ROAD_EVENT[1], pick_road)
 
+# حدث ٣: التغريز (يظهر فقط إذا اخترت الطريق غير الممهّد بدون تنسيم الكفرات)
 elif stage == "stuck":
     hud(); show_scene("stuck"); card(UNPAVED_NOT_AIRED); choices(STUCK_EVENT, pick_stuck)
 
+# حدث ٤: الشخص الواقف في الطريق (توصّله أو تكمل)
 elif stage == "person":
     hud(); show_scene("person"); card(PERSON_EVENT[0]); choices(PERSON_EVENT[1], pick_person)
 
+# شاشة نتيجة القرار: صورة + نص أو أكثر + زر "التالي"
 elif stage == "result":
     hud(); show_scene(S.r_img)
     for t in S.r_texts:
         card(t)
     st.button("التالي ◀", on_click=go, args=(S.r_next,))
 
+# شاشة النهاية: تُحدد حسب الوقت المتبقي (مثالية / جيدة / متأخرة)
 elif stage == "ending":
     end = get_ending(S.time)
     title, text = ENDINGS[end]
     show_scene(end)
     card(text, title, "end", name="النهاية")
+    # النهاية المثالية فقط: نعرض صورة الفوز الإضافية
     if end == "best":
         show_scene("best_win")
     st.markdown(f'<div class="chips" style="justify-content:center;margin-bottom:12px"><span class="chip">⏱ الوقت المتبقي عند الوصول: {max(S.time, 0)} دقيقة</span></div>', unsafe_allow_html=True)
