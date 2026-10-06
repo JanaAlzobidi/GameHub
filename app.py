@@ -4,6 +4,10 @@ from pathlib import Path
 import streamlit as st
 
 
+# =========================================================
+# PAGE CONFIG
+# =========================================================
+
 st.set_page_config(
     page_title="رحلة نجد",
     page_icon="🌴",
@@ -11,8 +15,20 @@ st.set_page_config(
 )
 
 
-ASSETS = Path(__file__).parent / "assets"
+# =========================================================
+# PATHS
+# =========================================================
 
+BASE_DIR = Path(__file__).parent
+
+ASSETS = BASE_DIR / "assets"
+
+FONTS = ASSETS / "fonts"
+
+
+# =========================================================
+# BASE64
+# =========================================================
 
 def b64(path: Path) -> str:
     return base64.b64encode(path.read_bytes()).decode()
@@ -48,11 +64,20 @@ GAMES = [
 
 
 # =========================================================
-# الصور
+# الصور والخطوط
 # =========================================================
 
 bg = b64(ASSETS / "background.png")
+
 frame = b64(ASSETS / "card_frame.png")
+
+saudi_regular = b64(
+    FONTS / "SaudiWeb-Regular.woff2"
+)
+
+saudi_bold = b64(
+    FONTS / "SaudiWeb-Bold.woff2"
+)
 
 
 # =========================================================
@@ -70,8 +95,11 @@ for g in GAMES:
 
     .st-key-card_{g['key']} {{
         background-image: url("data:image/png;base64,{frame}");
+
         background-position: center;
+
         background-size: 100% 100%;
+
         background-repeat: no-repeat;
 
         aspect-ratio: 900 / 1440;
@@ -83,6 +111,7 @@ for g in GAMES:
         padding: 25% 14% 10% 14%;
 
         display: flex;
+
         flex-direction: column;
     }}
 
@@ -93,7 +122,8 @@ for g in GAMES:
 
     .st-key-card_{g['key']} [data-testid="stImage"] {{
         margin-top: 10px;
-        margin-bottom: 0.7rem;
+
+        margin-bottom: 1.5rem;
 
         flex-shrink: 0;
 
@@ -113,28 +143,29 @@ for g in GAMES:
         display: block;
 
         margin-left: auto;
+
         margin-right: auto;
     }}
 
 
     /* =====================================================
-       TITLE
+       GAME TITLE
        ===================================================== */
 
     .st-key-card_{g['key']} .card-title {{
         text-align: center;
 
-        font-family: 'Tajawal', sans-serif;
+        font-family: 'Saudi', sans-serif !important;
 
-        font-weight: 800;
+        font-weight: 700;
 
-        font-size: 1.3rem;
+        font-size: 1.5rem;
 
         line-height: 1.35;
 
         color: #3d2b1a;
 
-        margin: 0.2rem 0 0.2rem 0;
+        margin: 0.2rem 0 0.3rem 0;
 
         padding: 0;
 
@@ -143,17 +174,17 @@ for g in GAMES:
 
 
     /* =====================================================
-       DESCRIPTION
+       GAME DESCRIPTION
        ===================================================== */
 
     .st-key-card_{g['key']} .card-desc {{
         text-align: center;
 
-        font-family: 'Tajawal', sans-serif;
+        font-family: 'Saudi', sans-serif !important;
 
         font-weight: 400;
 
-        font-size: 0.88rem;
+        font-size: 1rem;
 
         line-height: 1.5;
 
@@ -168,7 +199,7 @@ for g in GAMES:
 
 
     /* =====================================================
-       BUTTON
+       BUTTON CONTAINER
        ===================================================== */
 
     .st-key-card_{g['key']} .st-key-btn_{g['key']} {{
@@ -179,6 +210,10 @@ for g in GAMES:
         flex-shrink: 0;
     }}
 
+
+    /* =====================================================
+       BUTTON
+       ===================================================== */
 
     .st-key-btn_{g['key']} button {{
         background-color: {g['color']} !important;
@@ -193,7 +228,7 @@ for g in GAMES:
 
         padding: 0.55rem 1rem;
 
-        font-family: 'Tajawal', sans-serif;
+        font-family: 'Saudi', sans-serif !important;
 
         font-weight: 700;
 
@@ -217,9 +252,42 @@ st.markdown(
     f"""
     <style>
 
-    @import url(
-        'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Aref+Ruqaa:wght@700&display=swap'
-    );
+    /* =====================================================
+       SAUDI REGULAR FONT
+       ===================================================== */
+
+    @font-face {{
+        font-family: 'Saudi';
+
+        src: url(
+            "data:font/woff2;base64,{saudi_regular}"
+        ) format("woff2");
+
+        font-weight: 400;
+
+        font-style: normal;
+
+        font-display: swap;
+    }}
+
+
+    /* =====================================================
+       SAUDI BOLD FONT
+       ===================================================== */
+
+    @font-face {{
+        font-family: 'Saudi';
+
+        src: url(
+            "data:font/woff2;base64,{saudi_bold}"
+        ) format("woff2");
+
+        font-weight: 700;
+
+        font-style: normal;
+
+        font-display: swap;
+    }}
 
 
     /* =====================================================
@@ -230,7 +298,7 @@ st.markdown(
     body,
     [class*="css"],
     .stApp {{
-        font-family: 'Tajawal', sans-serif;
+        font-family: 'Saudi', sans-serif !important;
 
         direction: rtl;
     }}
@@ -275,17 +343,20 @@ st.markdown(
 
 
     /* =====================================================
-       PAGE TITLE
+       WEBSITE TITLE
+       رحلة نجد
        ===================================================== */
 
     .game-title {{
         text-align: center;
 
-        font-family: 'Aref Ruqaa', serif;
+        font-family: 'Saudi', sans-serif !important;
 
-        font-size: 4rem;
+        font-weight: 700 !important;
 
-        color: #6B4226;
+        font-size: 4rem !important;
+
+        color: #8B5E3C !important;
 
         margin: 0;
 
@@ -293,12 +364,20 @@ st.markdown(
     }}
 
 
+    /* =====================================================
+       WEBSITE SUBTITLE
+       ===================================================== */
+
     .game-sub {{
         text-align: center;
 
+        font-family: 'Saudi', sans-serif !important;
+
+        font-weight: 400;
+
         color: #5a4632;
 
-        font-size: 1.2rem;
+        font-size: 1.3rem;
 
         margin-top: 0.2rem;
 
@@ -328,10 +407,12 @@ st.markdown(
 # =========================================================
 
 if "page" not in st.session_state:
+
     st.session_state.page = "home"
 
 
 def go(page: str):
+
     st.session_state.page = page
 
 
@@ -341,10 +422,19 @@ def go(page: str):
 
 if st.session_state.page == "home":
 
+    # =====================================================
+    # اسم الموقع
+    # =====================================================
+
     st.markdown(
         '<h1 class="game-title">🌴 رحلة نجد</h1>',
         unsafe_allow_html=True,
     )
+
+
+    # =====================================================
+    # الوصف تحت اسم الموقع
+    # =====================================================
 
     st.markdown(
         '<div class="game-sub">ثلاث ألعاب .. تراث واحد</div>',
@@ -355,21 +445,31 @@ if st.session_state.page == "home":
     # Streamlit يرتب الأعمدة من اليسار إلى اليمين
     # لذلك نعكس الألعاب حتى تظهر رحلة البطل على اليمين
 
-    cols = st.columns(3, gap="small")
+    cols = st.columns(
+        3,
+        gap="small"
+    )
 
 
-    for col, g in zip(cols, reversed(GAMES)):
+    for col, g in zip(
+        cols,
+        reversed(GAMES)
+    ):
 
         with col:
 
-            with st.container(key=f"card_{g['key']}"):
+            with st.container(
+                key=f"card_{g['key']}"
+            ):
 
                 # =================================================
                 # أيقونة اللعبة
                 # =================================================
 
                 st.image(
-                    str(ASSETS / g["img"]),
+                    str(
+                        ASSETS / g["img"]
+                    ),
                     use_container_width=True,
                 )
 
@@ -398,7 +498,9 @@ if st.session_state.page == "home":
                 # زر اللعبة
                 # =================================================
 
-                with st.container(key=f"btn_{g['key']}"):
+                with st.container(
+                    key=f"btn_{g['key']}"
+                ):
 
                     st.button(
                         "ابدأ اللعبة  ‹",
@@ -432,7 +534,9 @@ else:
     )
 
 
-    st.info("هنا يجي كود اللعبة 🎮")
+    st.info(
+        "هنا يجي كود اللعبة 🎮"
+    )
 
 
     st.button(
