@@ -25,7 +25,7 @@ from story import (GAME_TITLE, TAGLINE, PROLOGUE, TIRE_EVENT, TIRE_CHECKED,
 st.set_page_config(page_title=GAME_TITLE, page_icon="🌠", layout="centered")
 
 # ───────────────────────── IMAGES (folder "images" next to this file) ─────────────────────────
-IMAGES_DIR = Path(__file__).parent.parent / "assets"
+IMAGES_DIR = Path(__file__).resolve().parents[2] / "assets"
 
 # اسم المشهد  ->  اسم ملف الصورة داخل مجلد images
 # أي مشهد ما له صورة هنا (أو الملف مو موجود) يستخدم الرسمة المدمجة بدلًا منها.
