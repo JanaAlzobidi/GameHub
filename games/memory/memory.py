@@ -524,6 +524,13 @@ def run_game():
 
         return f"data:{mime};base64,{data}"
 
+    def font_data_url(path: Path) -> str | None:
+        if not path.exists():
+            return None
+
+        data = base64.b64encode(path.read_bytes()).decode()
+        return f"data:font/woff2;base64,{data}"
+
     cards_payload = game.board_payload(IMAGES_DIR)
 
     for card in cards_payload:
@@ -531,6 +538,8 @@ def run_game():
             card["image"] = image_data_url(IMAGES_DIR / card["image"])
 
     back_image = image_data_url(IMAGES_DIR / "back.png")
+    regular_font = font_data_url(FONTS_DIR / "SaudiWeb-Regular.woff2")
+    bold_font = font_data_url(FONTS_DIR / "SaudiWeb-Bold.woff2")
 
     with board_col:
         event = board_component(
@@ -538,6 +547,8 @@ def run_game():
             columns=COLUMNS,
             max_columns=MAX_COLUMNS,
             back_image=back_image,
+            regular_font=regular_font,
+            bold_font=bold_font,
             pending_hide=game.pending_hide,
             game_over=game.game_over,
             key="board",
