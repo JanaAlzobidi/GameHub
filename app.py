@@ -15,9 +15,9 @@ st.set_page_config(
 
 
 # المسارات
-
 BASE_DIR = Path(__file__).parent
 ASSETS = BASE_DIR / "assets"
+UI_ASSETS = ASSETS / "ui"
 FONTS = ASSETS / "fonts"
 
 
@@ -59,8 +59,8 @@ GAMES = [
 
 # الصور والخطوط
 
-bg = b64(ASSETS / "background.png")
-frame = b64(ASSETS / "card_frame.png")
+bg = b64(UI_ASSETS / "background.png")
+frame = b64(UI_ASSETS / "card_frame.png")
 
 saudi_regular = b64(
     FONTS / "SaudiWeb-Regular.woff2"
@@ -370,10 +370,10 @@ if st.session_state.page == "home":
            ):
 
                 # أيقونة اللعبة
-
+                
                 st.image(
                     str(
-                        ASSETS / g["img"]
+                        UI_ASSETS / g["img"]
                     ),
                     use_container_width=True,
                 )
