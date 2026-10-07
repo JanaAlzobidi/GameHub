@@ -336,7 +336,7 @@ if st.session_state.page == "home":
     # اسم الموقع
 
     st.markdown(
-        '<h1 class="game-title">🌴 رحلة نجد</h1>',
+        '<h1 class="game-title">مِنّا وفينا</h1>',
         unsafe_allow_html=True,
     )
 
