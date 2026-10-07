@@ -509,27 +509,49 @@ def run_game():
 
 
     # ---------- يسار الشاشة: البطاقات ----------
+    def image_data_url(path: Path) -> str | None:
+        if not path.exists():
+            return None
+
+        data = base64.b64encode(path.read_bytes()).decode()
+
+        if path.suffix.lower() == ".png":
+            mime = "image/png"
+        elif path.suffix.lower() in {".jpg", ".jpeg"}:
+            mime = "image/jpeg"
+        else:
+            mime = "application/octet-stream"
+
+        return f"data:{mime};base64,{data}"
+
+    cards_payload = game.board_payload(IMAGES_DIR)
+
+    for card in cards_payload:
+        if card["image"]:
+            card["image"] = image_data_url(IMAGES_DIR / card["image"])
+
+    back_image = image_data_url(IMAGES_DIR / "back.png")
+
     with board_col:
         event = board_component(
-        cards=game.board_payload(IMAGES_DIR),
-        columns=COLUMNS,
-        max_columns=MAX_COLUMNS,
-        back_image="images/back.png" if (IMAGES_DIR / "back.png").exists() else None,
+            cards=cards_payload,
+            columns=COLUMNS,
+            max_columns=MAX_COLUMNS,
+            back_image=back_image,
             pending_hide=game.pending_hide,
             game_over=game.game_over,
             key="board",
             default=None,
         )
 
-    # الحدث الجديد فقط (الـ nonce يمنع معالجة نفس الضغطة مرتين)
-    if event and event.get("nonce") != st.session_state.last_nonce:
-        st.session_state.last_nonce = event.get("nonce")
-        if event.get("type") == "flip":
-            game.select(int(event["index"]))
-        elif event.get("type") == "hide":
-            game.hide_pending()
-        st.rerun()
-
+        # الحدث الجديد فقط (الـ nonce يمنع معالجة نفس الضغطة مرتين)
+        if event and event.get("nonce") != st.session_state.last_nonce:
+            st.session_state.last_nonce = event.get("nonce")
+            if event.get("type") == "flip":
+                game.select(int(event["index"]))
+            elif event.get("type") == "hide":
+                game.hide_pending()
+            st.rerun()
 
 
 if __name__ == "__main__":
