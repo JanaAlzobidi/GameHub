@@ -25,6 +25,7 @@ FONTS = ASSETS / "fonts"
 
 # تحويل الملفات إلى ترميز قاعدة 64
 
+@st.cache_data(show_spinner=False)
 def b64(path: Path) -> str:
     return base64.b64encode(path.read_bytes()).decode()
 
@@ -46,7 +47,7 @@ GAMES = [
         "key": "match",
         "img": "game2.png",
         "title": "رحلة في ذاكرة الوطن",
-        "desc": "طابق الصور <br>واكتشف أكثر عن السعودية",
+        "desc": "طابق الصور واكتشف<br>أكثر عن السعودية",
 
         "color": "#2F5D50",
     },
