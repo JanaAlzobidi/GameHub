@@ -74,6 +74,8 @@ saudi_bold = b64(
     FONTS / "SaudiWeb-Bold.woff2"
 )
 
+# تحميل صور الألعاب مع بعض
+
 game_images = {
     g["key"]: b64(UI_ASSETS / g["img"])
     for g in GAMES
@@ -333,7 +335,7 @@ st.markdown(
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
-
+# التنقل بين الصفحات مع إعادة ضبط حالة الألعاب عند الرجوع للرئيسية
 def go(page: str):
     if page == "home":
         keys_to_clear = [
