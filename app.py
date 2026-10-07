@@ -338,7 +338,7 @@ def go(page: str):
     if page == "home":
         keys_to_clear = [
             key
-            for key in st.session_state
+            for key in list(st.session_state.keys())
             if key.startswith("rpg_")
             or key.startswith("quiz_")
             or key in {"game", "last_nonce"}
