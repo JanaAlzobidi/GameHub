@@ -3,6 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 from games.rpg.rpg import show_hero_game
+from games.memory.memory import run_game as show_memory_game
 
 
 # إعدادات الصفحة
@@ -429,16 +430,7 @@ else:
 
 
     elif game["key"] == "match":
-
-        # =================================================
-        # كود رغد
-        # لعبة المطابقة
-        # =================================================
-
-        st.info(
-            "هنا يجي كود لعبة المطابقة"
-        )
-
+         show_memory_game()
 
     elif game["key"] == "quiz":
 
