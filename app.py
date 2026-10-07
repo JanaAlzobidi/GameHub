@@ -11,7 +11,7 @@ from games.quiz.app_sul import show_quiz_game
 
 st.set_page_config(
     page_title="مِنّا وفينا",
-    page_icon="🌴",
+    page_icon="🇸🇦",
     layout="wide",
 )
 
@@ -37,7 +37,7 @@ def b64(path: Path) -> str:
 GAMES = [
     {
         "key": "hero",
-        "img": "game1.png",
+        "img": "game3.png",
         "title": "موعد مع الشهب",
         "desc": "انطلق في رحلة لمطاردة الشهب<br>والتقط لقطتك قبل فوات الأوان",
         "color": "#8B5E3C",
@@ -51,7 +51,7 @@ GAMES = [
     },
     {
         "key": "quiz",
-        "img": "game3.png",
+        "img": "game1.png",
         "title": "لعبة المعلومات",
         "desc": "اختبر معرفتك بالثقافة<br>والتاريخ السعودي",
         "color": "#8B5E3C",
@@ -329,6 +329,18 @@ if "page" not in st.session_state:
 
 
 def go(page: str):
+    if page == "home":
+        keys_to_clear = [
+            key
+            for key in st.session_state
+            if key.startswith("rpg_")
+            or key.startswith("quiz_")
+            or key in {"game", "last_nonce"}
+        ]
+
+        for key in keys_to_clear:
+            del st.session_state[key]
+
     st.session_state.page = page
 
 
