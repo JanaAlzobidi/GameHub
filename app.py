@@ -2,6 +2,7 @@ import base64
 from pathlib import Path
 
 import streamlit as st
+from games.rpg.rpg import show_hero_game
 
 
 # إعدادات الصفحة
@@ -432,15 +433,7 @@ else:
     #  تكون اللعبة الي اختارها اللاعب game["key"] قيمة
 
     if game["key"] == "hero":
-
-        # =================================================
-        # كود دانية
-        # لعبة موعد مع الشهب
-        # =================================================
-
-        st.info(
-            "هنا يجي كود لعبة موعد مع الشهب"
-        )
+        show_hero_game()
 
 
     elif game["key"] == "match":
