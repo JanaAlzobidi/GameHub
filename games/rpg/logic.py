@@ -19,11 +19,11 @@ def check_tires(choice, time_left):
 def choose_road(choice, time_left):
     """
     معالجة اختيار الطريق.
-    A: تأخذ الطريق الممهّد.
-    B: تأخذ الطريق غير الممهّد.
+    A: تأخذ الطريق الممهّد (أبطأ: -35).
+    B: تأخذ الطريق غير الممهّد (أسرع: -20).
     """
     if choice == "A":
-        return time_left - 30, "paved"
+        return time_left - 35, "paved"
     return time_left - 20, "unpaved"
 
 
@@ -35,18 +35,18 @@ def handle_stuck(tire_aired, choice, time_left):
         تخرج السيارة بسرعة.
     إذا لم تكن الكفرات منسّمة:
         A: تحاول إخراج السيارة بنفسك،
-           لكنك تفشل، فتضطر لانتظار المساعدة في النهاية.
-        B: تنتظر مرور شخص يساعدك.
+           لكنك تفشل، فتضطر لانتظار المساعدة في النهاية (-35).
+        B: تنتظر مرور شخص يساعدك (-20).
     """
     if tire_aired:
         return time_left, False
-    return (time_left - 25 if choice == "A" else time_left - 15), True
+    return (time_left - 35 if choice == "A" else time_left - 20), True
 
 
 def help_person(choice, time_left):
     """
     معالجة قرار اللاعب الأخير تجاه الشخص الواقف في الطريق.
-    A: توصّل الشخص.
+    A: توصّل الشخص (+5).
     B: تكمل طريقك بدون مساعدته.
     """
     return time_left + 5 if choice == "A" else time_left
@@ -54,10 +54,11 @@ def help_person(choice, time_left):
 
 def get_ending(time_left):
     """
-    تحديد النهاية بناءً على الوقت المتبقي.
+    تحديد النهاية بناءً على الوقت المتبقي:
+    نصف ساعة أو أكثر = مثالية، من ٢٠ إلى ٢٩ = جيدة، أقل من ٢٠ = متأخرة.
     """
-    if time_left >= 35:
+    if time_left >= 30:
         return "best"
-    if time_left > 15:
+    if time_left >= 20:
         return "good"
     return "late"
