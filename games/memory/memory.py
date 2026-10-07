@@ -26,10 +26,13 @@ def run_game():
     # أقصى عدد أعمدة تختاره اللعبة تلقائياً لتكبير البطاقات (يرجع لـ COLUMNS لو غير موجود)
     MAX_COLUMNS = getattr(game_logic, "MAX_COLUMNS", COLUMNS)
 
-    BASE_DIR = Path(__file__).resolve().parent
-    BOARD_DIR = BASE_DIR / "board"
-    IMAGES_DIR = BOARD_DIR / "images"
-    FONTS_DIR = BOARD_DIR / "fonts"
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    ASSETS_DIR = BASE_DIR / "assets"
+    
+    BOARD_DIR = Path(__file__).resolve().parent / "board"
+    IMAGES_DIR = ASSETS_DIR / "memory" / "images"
+    FONTS_DIR = ASSETS_DIR / "fonts"
+    UI_ASSETS = ASSETS_DIR / "ui"
 
     try:  # لو الواجهة الرئيسية ضبطت الصفحة قبل، نتجاهل
         st.set_page_config(
@@ -129,7 +132,7 @@ def run_game():
     @st.cache_resource
     def background_css():
         """يحوّل صورة الخلفية لـ CSS (data URI) عشان Streamlit ما يخدم الملفات مباشرة."""
-        path = BASE_DIR / "assets" / "background.png"
+        path = UI_ASSETS / "background.png"
         if not path.exists():
             return ""
         data = base64.b64encode(path.read_bytes()).decode()
