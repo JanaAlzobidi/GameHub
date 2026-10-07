@@ -48,6 +48,7 @@ except ImportError:
 # ───────────────────────── المسارات (الصور والخطوط) ─────────────────────────
 
 IMAGES_DIR = Path(__file__).resolve().parents[2] / "assets"
+UI_ASSETS = IMAGES_DIR / "ui"
 FONTS_DIR = IMAGES_DIR / "fonts"
 
 SCENE_IMAGES = {
@@ -252,7 +253,7 @@ html, body, .stApp, [class*="css"], button { font-family:var(--font) !important;
 
 def apply_background():
     """خلفية اللعبة: صورة background.png مع طبقة تعتيم عشان النص يبقى مقروء."""
-    p = IMAGES_DIR / "background.png"
+    p = UI_ASSETS / "background.png"
     if not p.exists():
         return  # لو الصورة غير موجودة تبقى الخلفية الافتراضية (التدرج الأخضر)
     data = _b64(str(p), p.stat().st_mtime)
