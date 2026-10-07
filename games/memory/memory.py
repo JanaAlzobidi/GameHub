@@ -30,7 +30,7 @@ def run_game():
     ASSETS_DIR = BASE_DIR / "assets"
     
     BOARD_DIR = Path(__file__).resolve().parent
-    IMAGES_DIR = ASSETS_DIR / "memory" / "images"
+    IMAGES_DIR = ASSETS_DIR / "memory"
     FONTS_DIR = ASSETS_DIR / "fonts"
     UI_ASSETS = ASSETS_DIR / "ui"
 
