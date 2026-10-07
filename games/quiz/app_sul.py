@@ -1,4 +1,3 @@
-
 import base64
 import html
 import time
@@ -6,17 +5,23 @@ from pathlib import Path
 
 import streamlit as st
 
-
 try:
     from .questions import CATEGORIES
-    from .questions_game_logic import (QUESTION_TIME, MAX_SCORE, calculate_points,
-                                       pick_questions, summarize)
+    from .questions_game_logic import (
+        QUESTION_TIME, MAX_SCORE, calculate_points,
+        pick_questions, summarize
+    )
 except ImportError:
     from questions import CATEGORIES
-    from questions_game_logic import (QUESTION_TIME, MAX_SCORE, calculate_points,
-                                      pick_questions, summarize)
+    from questions_game_logic import (
+        QUESTION_TIME, MAX_SCORE, calculate_points,
+        pick_questions, summarize
+    )
 
 QUIZ_DIR = Path(__file__).resolve().parent
+
+ASSETS_DIR = QUIZ_DIR.parents[1] / "assets"
+QUIZ_ASSETS = ASSETS_DIR / "quiz"
 
 CSS = """
 <style>
@@ -184,11 +189,13 @@ def next_question():
 
 
 def find_image(path_str):
-    base = QUIZ_DIR / path_str
+    base = QUIZ_ASSETS / Path(path_str).name
+
     for ext in (base.suffix, ".jpg", ".jpeg", ".png", ".webp"):
         candidate = base.with_suffix(ext)
         if candidate.exists():
             return candidate
+
     return None
 
 
