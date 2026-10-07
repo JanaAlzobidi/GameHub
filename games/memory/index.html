@@ -3,11 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-@font-face { font-family: 'SaudiWeb'; font-weight: 400; font-display: swap;
-    src: url('fonts/SaudiWeb-Regular.woff2') format('woff2'); }
-@font-face { font-family: 'SaudiWeb'; font-weight: 700; font-display: swap;
-    src: url('fonts/SaudiWeb-Bold.woff2') format('woff2'); }
 
 html, body {
     margin: 0;
@@ -16,7 +13,11 @@ html, body {
     background: transparent;
     font-family: 'SaudiWeb', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
 }
-body { padding: 8px 10px 14px; box-sizing: border-box; }
+
+body {
+    padding: 8px 10px 14px;
+    box-sizing: border-box;
+}
 
 /* ===== الطبقة الخلفية (لوح مرفوع خلف البطاقات) ===== */
 #plate {
@@ -35,17 +36,26 @@ body { padding: 8px 10px 14px; box-sizing: border-box; }
         0 18px 34px rgba(45, 29, 16, .45),
         0 4px 0 rgba(255, 236, 190, .18);
 }
-#plate::before, #plate::after {
+
+#plate::before,
+#plate::after {
     content: "";
     position: absolute;
     top: 7px;
-    width: 12px; height: 12px;
+    width: 12px;
+    height: 12px;
     background: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 1 19 10 10 19 1 10Z' fill='none' stroke='%23e6c36a' stroke-width='1.5'/%3E%3Cpath d='M10 5.2 14.8 10 10 14.8 5.2 10Z' fill='%23e6c36a'/%3E%3C/svg%3E") center / contain no-repeat;
     opacity: .75;
     pointer-events: none;
 }
-#plate::before { left: 12px; }
-#plate::after  { right: 12px; }
+
+#plate::before {
+    left: 12px;
+}
+
+#plate::after {
+    right: 12px;
+}
 
 #board {
     --cols: 6;
@@ -61,7 +71,11 @@ body { padding: 8px 10px 14px; box-sizing: border-box; }
     box-sizing: border-box;
 }
 
-.slot { display: flex; flex-direction: column; align-items: center; }
+.slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .card {
     width: 100%;
@@ -79,7 +93,10 @@ body { padding: 8px 10px 14px; box-sizing: border-box; }
     transform-style: preserve-3d;
     transition: transform .35s cubic-bezier(.4, .2, .2, 1);
 }
-.card.open .inner { transform: rotateY(180deg); }
+
+.card.open .inner {
+    transform: rotateY(180deg);
+}
 
 .face {
     position: absolute;
@@ -91,21 +108,52 @@ body { padding: 8px 10px 14px; box-sizing: border-box; }
     box-shadow: 0 6px 16px rgba(63, 43, 27, .38);
     transition: box-shadow .2s;
 }
-.front { transform: rotateY(180deg); }
-.face img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+
+.front {
+    transform: rotateY(180deg);
+}
+
+.face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+}
 
 .fallback {
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    text-align: center; font-weight: 700;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
 }
-.fallback.back  { background: linear-gradient(135deg, #0b5560, #06404a); color: #f0d98a; font-size: 38px; }
-.fallback.front { background: linear-gradient(135deg, #0b5560, #06404a); color: #f0d98a; font-size: 22px; border: 2px solid #d9b95b; box-sizing: border-box; }
+
+.fallback.back {
+    background: linear-gradient(135deg, #0b5560, #06404a);
+    color: #f0d98a;
+    font-size: 38px;
+}
+
+.fallback.front {
+    background: linear-gradient(135deg, #0b5560, #06404a);
+    color: #f0d98a;
+    font-size: 22px;
+    border: 2px solid #d9b95b;
+    box-sizing: border-box;
+}
 
 .card:not(.open):not(.locked):hover .back {
     box-shadow: 0 0 0 3px #d8b85b, 0 8px 22px rgba(63, 43, 27, .42);
 }
-.card.open, .card.locked { cursor: default; }
+
+.card.open,
+.card.locked {
+    cursor: default;
+}
+
 .card.matched .front {
     box-shadow: 0 0 0 3px #d8b85b, 0 6px 20px rgba(216, 184, 91, .42);
 }
@@ -123,48 +171,137 @@ body { padding: 8px 10px 14px; box-sizing: border-box; }
     opacity: 0;
     transition: opacity .3s .25s;
 }
-.card.open + .caption { opacity: 1; }
+
+.card.open + .caption {
+    opacity: 1;
+}
+
 </style>
 </head>
+
 <body>
-<div id="plate"><div id="board"></div></div>
+
+<div id="plate">
+    <div id="board"></div>
+</div>
 
 <script>
+
 // ---------- بروتوكول Streamlit للمكوّنات (بدون مكتبات خارجية) ----------
+
 function send(type, data) {
-    window.parent.postMessage(Object.assign({ isStreamlitMessage: true, type: type }, data || {}), "*");
-}
-function setHeight() {
-    send("streamlit:setFrameHeight", { height: document.documentElement.scrollHeight });
-}
-var nonceCounter = 0;
-function emit(value) {
-    value.nonce = Date.now() + "-" + (++nonceCounter);
-    send("streamlit:setComponentValue", { value: value, dataType: "json" });
+    window.parent.postMessage(
+        Object.assign(
+            {
+                isStreamlitMessage: true,
+                type: type
+            },
+            data || {}
+        ),
+        "*"
+    );
 }
 
+function setHeight() {
+    send("streamlit:setFrameHeight", {
+        height: document.documentElement.scrollHeight
+    });
+}
+
+var nonceCounter = 0;
+
+function emit(value) {
+    value.nonce = Date.now() + "-" + (++nonceCounter);
+
+    send("streamlit:setComponentValue", {
+        value: value,
+        dataType: "json"
+    });
+}
+
+
+// ---------- الخطوط ----------
+
+function applyFonts(args) {
+
+    if (!args) {
+        return;
+    }
+
+    var style = document.getElementById("saudi-fonts");
+
+    if (!style) {
+        style = document.createElement("style");
+        style.id = "saudi-fonts";
+        document.head.appendChild(style);
+    }
+
+    var css = "";
+
+    if (args.regular_font) {
+        css += `
+            @font-face {
+                font-family: 'SaudiWeb';
+                font-style: normal;
+                font-weight: 400;
+                font-display: swap;
+                src: url('${args.regular_font}') format('woff2');
+            }
+        `;
+    }
+
+    if (args.bold_font) {
+        css += `
+            @font-face {
+                font-family: 'SaudiWeb';
+                font-style: normal;
+                font-weight: 700;
+                font-display: swap;
+                src: url('${args.bold_font}') format('woff2');
+            }
+        `;
+    }
+
+    style.textContent = css;
+}
+
+
 // ---------- الحالة ----------
+
 var boardEl = document.getElementById("board");
-var current = null;      // آخر args وصلت من بايثون
+var current = null;
 var cardEls = [];
-var waiting = false;     // نمنع ضغطات متتالية قبل ما بايثون يرد
+var waiting = false;
 var waitTimer = null;
 var hideTimer = null;
-var HIDE_DELAY_MS = 400;      // مدة بقاء البطاقتين غير المتطابقتين مفتوحتين
-var PREVIEW_MS = 3000;        // مدة عرض كل البطاقات مفتوحة بداية اللعبة
+
+var HIDE_DELAY_MS = 400;
+var PREVIEW_MS = 3000;
+
 var previewing = false;
 var previewTimer = null;
 
+
 function lockInput() {
     waiting = true;
+
     clearTimeout(waitTimer);
-    waitTimer = setTimeout(function () { waiting = false; }, 700);   // احتياط لو ما وصل رد
+
+    waitTimer = setTimeout(function () {
+        waiting = false;
+    }, 700);
 }
 
+
+// ---------- بناء لوحة البطاقات ----------
+
 function build(args) {
+
     boardEl.innerHTML = "";
     cardEls = [];
+
     args.cards.forEach(function (c, i) {
+
         var slot = document.createElement("div");
         slot.className = "slot";
 
@@ -174,155 +311,399 @@ function build(args) {
         var inner = document.createElement("div");
         inner.className = "inner";
 
+
+        // ---------- ظهر البطاقة ----------
+
         var back = document.createElement("div");
         back.className = "face back";
+
         if (args.back_image) {
-            var bi = document.createElement("img");
+
+            var bi = new Image();
+
             bi.src = args.back_image;
             bi.alt = "";
+
             back.appendChild(bi);
+
         } else {
+
             back.innerHTML = '<div class="fallback back">🇸🇦</div>';
         }
 
+
+        // ---------- وجه البطاقة ----------
+
         var front = document.createElement("div");
         front.className = "face front";
+
         if (c.image) {
-            var fi = document.createElement("img");
+
+            var fi = new Image();
+
             fi.src = c.image;
             fi.alt = c.name;
+
             front.appendChild(fi);
+
         } else {
+
             var fb = document.createElement("div");
+
             fb.className = "fallback front";
             fb.textContent = c.name;
+
             front.appendChild(fb);
         }
 
+
         inner.appendChild(back);
         inner.appendChild(front);
+
         card.appendChild(inner);
 
+
+        // ---------- اسم البطاقة ----------
+
         var caption = document.createElement("div");
+
         caption.className = "caption";
         caption.textContent = c.name;
 
-        card.addEventListener("click", function () { onCardClick(i); });
+
+        card.addEventListener("click", function () {
+            onCardClick(i);
+        });
+
 
         slot.appendChild(card);
         slot.appendChild(caption);
+
         boardEl.appendChild(slot);
+
         cardEls.push(card);
     });
 }
 
+
+// ---------- الضغط على البطاقة ----------
+
 function onCardClick(i) {
-    if (!current || waiting || current.game_over) return;
-    if (previewing) return;
+
+    if (!current || waiting || current.game_over) {
+        return;
+    }
+
+    if (previewing) {
+        return;
+    }
+
     var el = cardEls[i];
-    if (el.classList.contains("open")) return;
+
+    if (el.classList.contains("open")) {
+        return;
+    }
+
     lockInput();
-    emit({ type: "flip", index: i });
+
+    emit({
+        type: "flip",
+        index: i
+    });
 }
 
+
+// ---------- تحديث اللوحة ----------
+
 function update(args) {
+
     args.cards.forEach(function (c, i) {
+
         var el = cardEls[i];
-        el.classList.toggle("open", !!c.open || previewing);
-        el.classList.toggle("matched", !!c.matched);
-        el.classList.toggle("locked", !!args.game_over);
+
+        el.classList.toggle(
+            "open",
+            !!c.open || previewing
+        );
+
+        el.classList.toggle(
+            "matched",
+            !!c.matched
+        );
+
+        el.classList.toggle(
+            "locked",
+            !!args.game_over
+        );
     });
 
+
     // إخفاء البطاقتين غير المتطابقتين تلقائياً بعد ما تنشاف
+
     if (args.pending_hide) {
+
         if (!hideTimer) {
+
             hideTimer = setTimeout(function () {
+
                 hideTimer = null;
-                emit({ type: "hide" });
+
+                emit({
+                    type: "hide"
+                });
+
             }, HIDE_DELAY_MS);
         }
+
     } else if (hideTimer) {
+
         clearTimeout(hideTimer);
         hideTimer = null;
     }
 }
 
-// الارتفاع المتاح للوحة 
+
+// ---------- الارتفاع المتاح للوحة ----------
+
 function availableHeight() {
+
     try {
-        var top = window.frameElement.getBoundingClientRect().top;
+
+        var top = window.frameElement
+            .getBoundingClientRect()
+            .top;
+
         return window.parent.innerHeight - top - 10;
+
     } catch (e) {
-        return Math.max(window.screen.availHeight - 240, 360);
+
+        return Math.max(
+            window.screen.availHeight - 240,
+            360
+        );
     }
 }
 
-// نختار عدد الأعمدة والحجم اللي يخلي كل البطاقات تبان في الشاشة بدون تمرير
-var CAPTION_H = 22, GAP = 10, MAX_CW = 240, MIN_CW = 50;
-// حواف: جسم الصفحة (10+10 / 8+14) + اللوح (24+24) + إطاره (2+2)
-var EDGE_X = 20 + 48 + 4, EDGE_Y = 22 + 48 + 4;
+
+// ---------- حساب حجم البطاقات ----------
+
+var CAPTION_H = 22;
+var GAP = 10;
+var MAX_CW = 240;
+var MIN_CW = 50;
+
+// حواف: جسم الصفحة + اللوح + إطاره
+var EDGE_X = 20 + 48 + 4;
+var EDGE_Y = 22 + 48 + 4;
+
+
 function applyColumns() {
-    if (!current) return;
+
+    if (!current) {
+        return;
+    }
+
     var n = current.cards.length;
     var wanted = current.columns || 6;
-    var maxCols = Math.max(wanted, current.max_columns || wanted);
+    var maxCols = Math.max(
+        wanted,
+        current.max_columns || wanted
+    );
+
     var availW = window.innerWidth - EDGE_X;
-    var availH = Math.max(availableHeight(), 320) - EDGE_Y;
-    var best = null, pref = null;
+
+    var availH = Math.max(
+        availableHeight(),
+        320
+    ) - EDGE_Y;
+
+    var best = null;
+    var pref = null;
+
+
     for (var cols = 3; cols <= maxCols; cols++) {
+
         var rows = Math.ceil(n / cols);
-        var cwW = (availW - (cols - 1) * GAP) / cols;
-        var cwH = (((availH - (rows - 1) * GAP) / rows) - CAPTION_H) / 1.4;
-        var item = { cols: cols, rows: rows, cw: Math.min(cwW, cwH, MAX_CW) };
-        if (!best || item.cw > best.cw + 0.5) best = item;
-        if (cols === wanted) pref = item;
+
+        var cwW =
+            (availW - (cols - 1) * GAP) / cols;
+
+        var cwH =
+            (
+                (
+                    availH - (rows - 1) * GAP
+                ) / rows
+                - CAPTION_H
+            ) / 1.4;
+
+        var item = {
+            cols: cols,
+            rows: rows,
+            cw: Math.min(
+                cwW,
+                cwH,
+                MAX_CW
+            )
+        };
+
+
+        if (!best || item.cw > best.cw + 0.5) {
+            best = item;
+        }
+
+        if (cols === wanted) {
+            pref = item;
+        }
     }
+
+
     // نفضّل العدد المطلوب (COLUMNS)
-    if (pref && best.cw < pref.cw * 1.06) best = pref;
-    var cw = Math.max(Math.floor(best.cw), MIN_CW);
-    boardEl.style.setProperty("--cols", best.cols);
-    boardEl.style.setProperty("--cw", cw + "px");
-    boardEl.style.setProperty("--gap", GAP + "px");
-    // حجم خط الاسم يكبر مع البطاقة (12px للصغيرة لين 16px للكبيرة)
-    boardEl.style.setProperty("--cap-fs", Math.max(12, Math.min(16, Math.round(cw * 0.105))) + "px");
+
+    if (pref && best.cw < pref.cw * 1.06) {
+        best = pref;
+    }
+
+
+    var cw = Math.max(
+        Math.floor(best.cw),
+        MIN_CW
+    );
+
+
+    boardEl.style.setProperty(
+        "--cols",
+        best.cols
+    );
+
+    boardEl.style.setProperty(
+        "--cw",
+        cw + "px"
+    );
+
+    boardEl.style.setProperty(
+        "--gap",
+        GAP + "px"
+    );
+
+
+    // حجم خط الاسم يكبر مع البطاقة
+
+    boardEl.style.setProperty(
+        "--cap-fs",
+        Math.max(
+            12,
+            Math.min(
+                16,
+                Math.round(cw * 0.105)
+            )
+        ) + "px"
+    );
+
     setHeight();
 }
-window.addEventListener("resize", applyColumns);
 
-// بداية اللعبة: كل البطاقات مفتوحة ثواني وبعدين تتقفل
+
+window.addEventListener(
+    "resize",
+    applyColumns
+);
+
+
+// ---------- بداية اللعبة ----------
+
 function startPreview() {
+
     previewing = true;
+
     clearTimeout(previewTimer);
+
     previewTimer = setTimeout(function () {
+
         previewing = false;
-        if (current) update(current);
+
+        if (current) {
+            update(current);
+        }
+
     }, PREVIEW_MS);
 }
 
+
+// ---------- استقبال البيانات من Streamlit ----------
+
 function onRender(args) {
+
     waiting = false;
-    var needBuild = !current || current.cards.length !== args.cards.length ||
-        current.cards.some(function (c, i) { return c.image !== args.cards[i].image || c.name !== args.cards[i].name; });
+
+    // تطبيق الخطوط المرسلة من Python
+    applyFonts(args);
+
+
+    var needBuild =
+        !current ||
+        current.cards.length !== args.cards.length ||
+        current.cards.some(function (c, i) {
+            return (
+                c.image !== args.cards[i].image ||
+                c.name !== args.cards[i].name
+            );
+        });
+
+
     current = args;
+
+
     if (needBuild) {
+
         build(args);
+
         startPreview();
     }
+
+
     update(args);
+
     applyColumns();
 }
 
-window.addEventListener("message", function (event) {
-    if (event.data && event.data.type === "streamlit:render") {
-        onRender(event.data.args);
+
+// ---------- استقبال رسائل Streamlit ----------
+
+window.addEventListener(
+    "message",
+    function (event) {
+
+        if (
+            event.data &&
+            event.data.type === "streamlit:render"
+        ) {
+            onRender(event.data.args);
+        }
     }
-});
+);
+
+
+// ---------- مراقبة حجم الصفحة ----------
 
 if (window.ResizeObserver) {
-    new ResizeObserver(setHeight).observe(document.body);
+
+    new ResizeObserver(setHeight)
+        .observe(document.body);
 }
-send("streamlit:componentReady", { apiVersion: 1 });
+
+
+// ---------- جاهزية المكوّن ----------
+
+send(
+    "streamlit:componentReady",
+    {
+        apiVersion: 1
+    }
+);
+
 setHeight();
+
 </script>
+
 </body>
 </html>
