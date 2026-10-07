@@ -8,7 +8,6 @@ from pathlib import Path
 
 # ---------------------------------------------------------------
 # بيانات البطاقات (collection): كل بطاقة dict
-# "image" = اسم ملف الصورة داخل assets/memory/images
 # ---------------------------------------------------------------
 CARDS = [
     {
@@ -137,11 +136,11 @@ class MemoryGame:
         self.hide_pending()
 
         card = self.deck[index]
-        if card["id"] in self.matched or index in self.flipped:   # condition
+        if card["id"] in self.matched or index in self.flipped:   # شرط التطابق
             return
 
         self.flipped.append(index)
-        if len(self.flipped) < 2:
+        if len(self.flipped) < 2:   #اذا اللاعب بس اختار بطاقة وحدة ينتظر لين يختار ثانية
             return
 
         # صار عندنا بطاقتين -> نفحص
@@ -149,7 +148,7 @@ class MemoryGame:
         first = self.deck[self.flipped[0]]
         second = self.deck[self.flipped[1]]
 
-        if first["id"] == second["id"]:
+        if first["id"] == second["id"]: #اذا تطابق
             self.matched.add(first["id"])
             self.score += MATCH_SCORE
             self.fact = f"✨ {first['name']}: {first['fact']}"
@@ -157,11 +156,11 @@ class MemoryGame:
             self.delta_id += 1
             self.flipped = []
 
-            if len(self.matched) == len(CARDS):
+            if len(self.matched) == len(CARDS): #اذا فاز
                 self.score += WIN_BONUS_SCORE
                 self.game_over = True
         else:
-            self.score = max(0, self.score - MISS_PENALTY)
+            self.score = max(0, self.score - MISS_PENALTY)  #اذا ما تتطابق
             self.last_delta = -MISS_PENALTY
             self.delta_id += 1
             self.pending_hide = True
