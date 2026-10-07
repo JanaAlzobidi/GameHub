@@ -7,7 +7,7 @@ import streamlit as st
 # إعدادات الصفحة
 
 st.set_page_config(
-    page_title="رحلة نجد",
+    page_title="مِنّا وفينا",
     page_icon="🌴",
     layout="wide",
 )
