@@ -79,16 +79,33 @@ CSS = """
 .st-key-quiz .stButton>button:disabled{opacity:.45;}
 
 /* التصنيفات: كل تصنيف في سطر مستقل */
-.st-key-quiz .stCheckbox{background:rgba(255,250,238,.9);border:2px solid rgba(139,94,60,.5);border-radius:18px;
- padding:1rem 1.4rem;margin-bottom:.75rem;}
-.st-key-quiz .stCheckbox label{width:100%;cursor:pointer;display:flex;align-items:center;gap:1rem;}
-.st-key-quiz .stCheckbox p{font-size:1.6rem;font-weight:700;color:#3d2b1a;margin:0;}
-.st-key-quiz .stCheckbox:hover{border-color:#8B5E3C;}
-.st-key-quiz .stCheckbox:has(input:checked),.st-key-quiz .stCheckbox:has(label[data-selected="true"]){
- background:rgba(241,224,194,.97);border-color:#8B5E3C;}
-.st-key-quiz .stCheckbox label>div:first-of-type{width:1.9rem;height:1.9rem;min-width:1.9rem;border-radius:8px;}
-.st-key-quiz .stCheckbox label[data-selected="true"]>div:first-of-type{background:#8B5E3C !important;border-color:#8B5E3C !important;}
+.st-key-quiz .stCheckbox label{
+    width:100%;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+}
 
+.st-key-quiz .stCheckbox p{
+    flex:1;
+    width:auto;
+    font-size:1.6rem;
+    font-weight:700;
+    color:#3d2b1a;
+    margin:0;
+    white-space:nowrap;
+}
+
+.st-key-quiz .stCheckbox:hover{
+    border-color:#8B5E3C;
+}
+
+.st-key-quiz .stCheckbox:has(input:checked),
+.st-key-quiz .stCheckbox:has(label[data-selected="true"]){
+    background:rgba(241,224,194,.97);
+    border-color:#8B5E3C;
+}
 /* خيارات الإجابة: كبيرة ومتساوية الحجم */
 .st-key-quiz_opts button{min-height:92px;padding:.8rem 1rem;border-radius:20px !important;}
 .st-key-quiz_opts button p{font-size:1.3rem !important;line-height:1.5;}
