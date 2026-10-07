@@ -421,14 +421,6 @@ else:
     )
 
 
-    # اسم اللعبة
-
-    st.markdown(
-        f'<h1 class="game-title">{game["title"]}</h1>',
-        unsafe_allow_html=True,
-    )
-
-
     # مكان إضافة كود الألعاب
     #  تكون اللعبة الي اختارها اللاعب game["key"] قيمة
 
