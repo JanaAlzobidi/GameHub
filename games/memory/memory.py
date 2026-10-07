@@ -511,10 +511,10 @@ def run_game():
     # ---------- يسار الشاشة: البطاقات ----------
     with board_col:
         event = board_component(
-            cards=game.board_payload(IMAGES_DIR),
-            columns=COLUMNS,
-            max_columns=MAX_COLUMNS,
-            back_image="images/back.png" if (IMAGES_DIR / "back.png").exists() else None,
+        cards=game.board_payload(IMAGES_DIR),
+        columns=COLUMNS,
+        max_columns=MAX_COLUMNS,
+        back_image="images/back.png" if (IMAGES_DIR / "back.png").exists() else None,
             pending_hide=game.pending_hide,
             game_over=game.game_over,
             key="board",
