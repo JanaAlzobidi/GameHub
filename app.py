@@ -74,6 +74,10 @@ saudi_bold = b64(
     FONTS / "SaudiWeb-Bold.woff2"
 )
 
+game_images = {
+    g["key"]: b64(UI_ASSETS / g["img"])
+    for g in GAMES
+}
 
 # تنسيق بطاقات الألعاب
 
@@ -104,22 +108,22 @@ for g in GAMES:
        صورة اللعبة
        ===================================================== */
 
-    .st-key-card_{g['key']} [data-testid="stImage"] {{
-        margin-top: 10px;
-        margin-bottom: 1.5rem;
-        flex-shrink: 0;
-        text-align: center;
-    }}
-
-    .st-key-card_{g['key']} [data-testid="stImage"] img {{
-        width: 80% !important;
-        height: auto !important;
-        max-height: 170px;
-        object-fit: contain;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }}
+        .st-key-card_{g['key']} .game-image {{
+            margin-top: 10px;
+            margin-bottom: 1.5rem;
+            flex-shrink: 0;
+            text-align: center;
+        }}
+        
+        .st-key-card_{g['key']} .game-image img {{
+            width: 80%;
+            height: auto;
+            max-height: 170px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }}
 
 
     /* =====================================================
@@ -334,7 +338,7 @@ def go(page: str):
     if page == "home":
         keys_to_clear = [
             key
-            for key in st.session_state
+            for key in list(st.session_state.keys())
             if key.startswith("rpg_")
             or key.startswith("quiz_")
             or key in {"game", "last_nonce"}
@@ -387,11 +391,13 @@ if st.session_state.page == "home":
 
                 # أيقونة اللعبة
                 
-                st.image(
-                    str(
-                        UI_ASSETS / g["img"]
-                    ),
-                    use_container_width=True,
+                st.markdown(
+                    f"""
+                    <div class="game-image">
+                        <img src="data:image/png;base64,{game_images[g['key']]}">
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
                 )
 
 
