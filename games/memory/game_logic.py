@@ -160,7 +160,7 @@ class MemoryGame:
                 self.score += WIN_BONUS_SCORE
                 self.game_over = True
         else:
-            self.score = max(0, self.score - MISS_PENALTY)  #اذا ما تتطابق
+            self.score = max(0, self.score - MISS_PENALTY)  #اذا ما فيه تطابق بين البطاقتين
             self.last_delta = -MISS_PENALTY
             self.delta_id += 1
             self.pending_hide = True
