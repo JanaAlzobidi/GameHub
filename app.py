@@ -2,9 +2,7 @@ import base64
 from pathlib import Path
 
 import streamlit as st
-from games.rpg.rpg import show_hero_game
-from games.memory.memory import run_game as show_memory_game
-from games.quiz.app_sul import show_quiz_game
+
 
 
 # إعدادات الصفحة
@@ -449,12 +447,16 @@ else:
     #  تكون اللعبة الي اختارها اللاعب game["key"] قيمة
 
     if game["key"] == "hero":
+        from games.rpg.rpg import show_hero_game
         show_hero_game()
+
     elif game["key"] == "match":
-         show_memory_game()
+        from games.memory.memory import run_game as show_memory_game
+        show_memory_game()
+
     elif game["key"] == "quiz":
+        from games.quiz.app_sul import show_quiz_game
         show_quiz_game()
-        
     # زر الرجوع للصفحة الرئيسية
 
     st.button(
