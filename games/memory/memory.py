@@ -29,7 +29,7 @@ def run_game():
     BASE_DIR = Path(__file__).resolve().parents[2]
     ASSETS_DIR = BASE_DIR / "assets"
     
-    BOARD_DIR = Path(__file__).resolve().parent / "board"
+    BOARD_DIR = Path(__file__).resolve().parent
     IMAGES_DIR = ASSETS_DIR / "memory" / "images"
     FONTS_DIR = ASSETS_DIR / "fonts"
     UI_ASSETS = ASSETS_DIR / "ui"
