@@ -4,6 +4,7 @@ from pathlib import Path
 import streamlit as st
 from games.rpg.rpg import show_hero_game
 from games.memory.memory import run_game as show_memory_game
+from games.quiz.app_sul import show_quiz_game
 
 
 # إعدادات الصفحة
@@ -427,23 +428,11 @@ else:
 
     if game["key"] == "hero":
         show_hero_game()
-
-
     elif game["key"] == "match":
          show_memory_game()
-
     elif game["key"] == "quiz":
-
-        # =================================================
-        # كود سليمان
-        # لعبة المعلومات
-        # =================================================
-
-        st.info(
-            "هنا يجي كود لعبة المعلومات"
-        )
-
-
+        show_quiz_game()
+        
     # زر الرجوع للصفحة الرئيسية
 
     st.button(
