@@ -78,8 +78,18 @@ CSS = """
  background:#8B5E3C !important;filter:brightness(1.12);color:#fff !important;}
 .st-key-quiz .stButton>button:disabled{opacity:.45;}
 
-/* التصنيفات: كل تصنيف في سطر مستقل */
-.st-key-quiz .stCheckbox label{
+/* التصنيفات */
+.st-key-quiz [data-testid="stCheckbox"]{
+    width:100% !important;
+    background:rgba(255,250,238,.9);
+    border:2px solid rgba(139,94,60,.5);
+    border-radius:18px;
+    padding:1rem 1.4rem;
+    margin-bottom:.75rem;
+    box-sizing:border-box;
+}
+
+.st-key-quiz [data-testid="stCheckbox"] label{
     width:100%;
     cursor:pointer;
     display:flex;
@@ -87,7 +97,7 @@ CSS = """
     gap:1rem;
 }
 
-.st-key-quiz .stCheckbox p{
+.st-key-quiz [data-testid="stCheckbox"] label p{
     flex:1;
     width:auto;
     font-size:1.6rem;
@@ -97,12 +107,11 @@ CSS = """
     white-space:nowrap;
 }
 
-.st-key-quiz .stCheckbox:hover{
+.st-key-quiz [data-testid="stCheckbox"]:hover{
     border-color:#8B5E3C;
 }
 
-.st-key-quiz .stCheckbox:has(input:checked),
-.st-key-quiz .stCheckbox:has(label[data-selected="true"]){
+.st-key-quiz [data-testid="stCheckbox"]:has(input:checked){
     background:rgba(241,224,194,.97);
     border-color:#8B5E3C;
 }
