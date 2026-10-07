@@ -442,7 +442,7 @@ def run_game():
     # =========================
     # Header
     # =========================
-    board_col, info_col = st.columns([3.1, 1], gap="medium")
+    info_col, board_col = st.columns([1, 3.1], gap="medium")
 
     # ---------- يمين الشاشة: النقاط والمعلومة والمحاولات ----------
     with info_col:
