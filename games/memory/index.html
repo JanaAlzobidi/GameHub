@@ -189,7 +189,7 @@ function build(args) {
         front.className = "face front";
         if (c.image) {
             var fi = document.createElement("img");
-            fi.src = "images/" + encodeURIComponent(c.image);
+            fi.src = c.image;
             fi.alt = c.name;
             front.appendChild(fi);
         } else {
