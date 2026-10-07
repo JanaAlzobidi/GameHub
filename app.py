@@ -276,7 +276,7 @@ st.markdown(
         text-align: center;
         font-family: 'Saudi', sans-serif !important;
         font-weight: 700 !important;
-        font-size: 6.4em !important;
+        font-size: 5.5em !important;
         color: #8B5E3C !important;
         margin: 0;
         line-height: 1.2;
