@@ -47,9 +47,10 @@ except ImportError:
 
 # ───────────────────────── المسارات (الصور والخطوط) ─────────────────────────
 
-IMAGES_DIR = Path(__file__).resolve().parents[2] / "assets"
-UI_ASSETS = IMAGES_DIR / "ui"
-FONTS_DIR = IMAGES_DIR / "fonts"
+ASSETS_DIR = Path(__file__).resolve().parents[2] / "assets"
+RPG_IMAGES = ASSETS_DIR / "rpg"
+UI_ASSETS = ASSETS_DIR / "ui"
+FONTS_DIR = ASSETS_DIR / "fonts"
 
 SCENE_IMAGES = {
      "title":      "الواجهة2.jpg",          
@@ -87,7 +88,7 @@ def _b64(path_str, mtime):
 def show_scene(key):
     """يعرض صورة المشهد (key). إذا الصورة غير موجودة يعرض لوحة بديلة."""
     name = SCENE_IMAGES.get(key)
-    path = IMAGES_DIR / name if name else None
+    path = RPG_IMAGES / name if name else None
     if path and path.exists():
         
         ext = path.suffix.lower().lstrip(".")
